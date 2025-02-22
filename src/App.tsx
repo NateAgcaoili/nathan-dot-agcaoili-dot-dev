@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import "./App.css";
+import Taskbar from "./Taskbar/Taskbar"; // <-- Import the Taskbar
 
 // Importing Social Media Icons
 import linkedinIcon from "./assets/icons/github.svg"; // Replace with actual LinkedIn icon
@@ -65,6 +66,8 @@ const App: React.FC = () => {
           <img src={githubIcon} alt="GitHub" className="social-icon" />
         </a>
       </div>
+      {/* Render the Taskbar at the bottom */}
+      <Taskbar />
     </div>
   );
 };
