@@ -2,8 +2,8 @@ import React, { useState, useEffect } from "react";
 import "./App.css";
 
 // Importing Social Media Icons
-import linkedinIcon from "./assets/linkedin.svg"; // Replace with actual LinkedIn icon
-import githubIcon from "./assets/github.svg"; // Replace with actual GitHub icon
+import linkedinIcon from "./assets/icons/github.svg"; // Replace with actual LinkedIn icon
+import githubIcon from "./assets/icons/linkedin.svg"; // Replace with actual GitHub icon
 
 const messages = [
   "hi...",
@@ -41,14 +41,27 @@ const App: React.FC = () => {
 
   return (
     <div className="container">
-      <pre className="typing-effect">{displayedText}</pre> {/* Ensures line breaks */}
-
+      {/* Background Video */}
+      <video className="background-video" autoPlay loop muted playsInline>
+        <source src="/videos/vw_bg.mp4" type="video/mp4" />
+        Your browser does not support the video tag.
+      </video>
+      <pre className="typing-effect">{displayedText}</pre>{" "}
+      {/* Ensures line breaks */}
       {/* Social Media Icons (Appear after Typing Effect with Fade-In) */}
       <div className={`social-links ${showIcons ? "fade-in" : ""}`}>
-        <a href="https://www.linkedin.com/in/nathan-agcaoili" target="_blank" rel="noopener noreferrer">
+        <a
+          href="https://www.linkedin.com/in/YOUR-LINKEDIN"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
           <img src={linkedinIcon} alt="LinkedIn" className="social-icon" />
         </a>
-        <a href="https://github.com/NateAgcaoili" target="_blank" rel="noopener noreferrer">
+        <a
+          href="https://github.com/YOUR-GITHUB"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
           <img src={githubIcon} alt="GitHub" className="social-icon" />
         </a>
       </div>
