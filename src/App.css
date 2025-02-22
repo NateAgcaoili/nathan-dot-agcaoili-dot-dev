@@ -1,0 +1,43 @@
+body {
+  background-color: #121212;
+  color: white;
+  font-family: Arial, sans-serif;
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  flex-direction: column;
+  white-space: pre-line;
+}
+
+.typing-effect {
+  font-size: 24px;
+  text-align: center;
+  white-space: pre-line;
+}
+
+/* Centering the Social Media Icons */
+.social-links {
+  margin-top: 20px;
+  display: flex;
+  gap: 20px;
+  justify-content: center; /* Ensures Icons are Centered */
+  opacity: 0; /* Initially Hidden */
+  transition: opacity 1s ease-in-out; /* Fade-in Effect */
+}
+
+/* Apply Fade-In When Icons Are Ready */
+.fade-in {
+  opacity: 1;
+}
+
+.social-icon {
+  width: 50px;
+  height: 50px;
+  transition: transform 0.3s ease-in-out;
+}
+
+.social-icon:hover {
+  transform: scale(1.1);
+}
