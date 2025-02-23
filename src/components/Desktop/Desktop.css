@@ -1,0 +1,17 @@
+.desktop {
+  /* Fill the viewport height minus the taskbar (32px) */
+  width: 100%;
+  height: calc(100vh - 42px);
+  padding: 10px;
+  box-sizing: border-box;
+
+  /* Multi-column layout: each column ~80px wide, 10px gap */
+  column-width: 80px;
+  column-gap: 10px;
+
+  /* Let the columns fill top-to-bottom automatically */
+  column-fill: auto;
+
+  /* Optional: if content overflows, allow scrolling */
+  overflow-y: auto;
+}
