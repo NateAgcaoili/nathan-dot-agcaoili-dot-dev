@@ -1,0 +1,78 @@
+.desktop-icon {
+  position: relative;
+  display: inline-block;
+  width: 120px; /* Icon container width */
+  margin-bottom: 10px;
+  text-align: center;
+  cursor: default;
+
+  /* Prevent multi-column breaks if using column layout */
+  break-inside: avoid;
+  -webkit-column-break-inside: avoid;
+  -moz-column-break-inside: avoid;
+}
+
+.icon-wrapper {
+  position: relative;
+  width: 75px; /* Icon size */
+  height: 75px;
+  margin: 0 auto;
+}
+
+.icon-image {
+  width: 75px;
+  height: 75px;
+  display: block;
+}
+
+/* 
+  1) White text with black shadow by default
+  2) Enough width for multi-word labels (like "Network Neighborhood")
+  3) Prevent word splitting (keep-all)
+  4) Center text and allow wrapping if it exceeds one line
+*/
+.icon-name {
+  display: block;
+  max-width: 120px; /* Matches icon width */
+  margin: 4px auto 0; /* 4px top margin, auto center horizontally */
+  font-size: 15px; /* Slightly larger for readability */
+  line-height: 1.2;
+  color: #fff; /* White text */
+  text-shadow: 1px 1px 0 #000; /* Black shadow */
+  text-align: center;
+
+  /* Wrap whole words, never split in the middle */
+  white-space: normal;
+  overflow-wrap: normal;
+  word-break: keep-all;
+  /* 
+     This ensures "Network Neighborhood" can move to two lines
+     if it doesn't fit in one line, but won't break "Neighbor-hood".
+  */
+
+  padding: 0 2px; /* Keep consistent label size */
+  background-color: transparent;
+  border: none;
+  transition: background-color 0.1s, color 0.1s, border 0.1s, text-shadow 0.1s;
+}
+
+/* SELECTED styles */
+.selected .icon-name {
+  background-color: #000080; /* Win95 navy */
+  color: #fff;
+  text-shadow: none; /* Remove the black shadow on dark bg */
+  border: 1px dotted #ff0; /* Yellow dotted border */
+}
+
+/* Optional: TINT OVERLAY on the icon when selected */
+.selected .icon-wrapper::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 75px;
+  height: 75px;
+  background-color: #000080;
+  opacity: 0.3;
+  pointer-events: none;
+}
