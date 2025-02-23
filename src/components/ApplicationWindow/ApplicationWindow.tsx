@@ -66,6 +66,7 @@ const ApplicationWindow: React.FC<ApplicationWindowProps> = ({
   };
 
   const handleDragStop: DraggableEventHandler = (e, data) => {
+    e;
     if (!maximized) {
       setPosition({ x: data.x, y: data.y });
     }
