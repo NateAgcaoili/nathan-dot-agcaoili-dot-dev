@@ -7,35 +7,36 @@ interface ApplicationWindowProps {
   iconSrc: string;
   onClose: () => void;
   children: React.ReactNode;
+  // Flag to determine if this app should open full screen on desktop.
+  // For now, we'll default it to false.
+  defaultMaximized?: boolean;
 }
 
-const TASKBAR_HEIGHT = 42; // Height of your taskbar
+const TASKBAR_HEIGHT = 42; // Adjust this if your taskbar is a different height
 
 const ApplicationWindow: React.FC<ApplicationWindowProps> = ({
   title,
   iconSrc,
   onClose,
   children,
+  defaultMaximized = false, // default is not full screen on desktop
 }) => {
   const [isMobile, setIsMobile] = useState(false);
-  const [maximized, setMaximized] = useState(true); // Start maximized
+  const [maximized, setMaximized] = useState(defaultMaximized);
   const [minimized, setMinimized] = useState(false);
 
-  // Position for the window when NOT maximized
+  // For restored state, store position and size:
   const [position, setPosition] = useState<{ x: number; y: number }>({
     x: 100,
     y: 100,
   });
-  // Default size when not maximized (you can adjust these)
   const [size, setSize] = useState<{ width: number; height: number }>({
-    width: 400,
-    height: 300,
+    width: 1000,
+    height: 800,
   });
 
-  // We'll store a ref to the outer div if needed
   const windowRef = useRef<HTMLDivElement>(null);
 
-  // Detect if we are on mobile
   useEffect(() => {
     const handleResize = () => {
       setIsMobile(window.innerWidth <= 768);
@@ -45,29 +46,34 @@ const ApplicationWindow: React.FC<ApplicationWindowProps> = ({
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  // If user tries to drag the header while maximized, unmaximize
+  // When maximized on desktop, force the window to fill available space
+  useEffect(() => {
+    if (maximized && windowRef.current) {
+      windowRef.current.style.transform = "none";
+      windowRef.current.style.top = "0";
+      windowRef.current.style.left = "0";
+    }
+  }, [maximized]);
+
+  // When the user starts dragging the header, if maximized then restore
   const handleDragStart: DraggableEventHandler = () => {
     if (maximized) {
-      // Unmaximize
       setMaximized(false);
-      setPosition({ x: 100, y: 100 }); // Move to a default position
-      setSize({ width: 400, height: 300 }); // Default restored size
+      // Restore to a default restored size/position.
+      setPosition({ x: 100, y: 100 });
+      setSize({ width: 400, height: 300 });
     }
   };
 
-  // After dragging stops, record the new position
   const handleDragStop: DraggableEventHandler = (e, data) => {
     if (!maximized) {
       setPosition({ x: data.x, y: data.y });
-      console.log(e);
     }
   };
 
   const handleMaximize = () => {
-    // If we're minimized, restore first
     if (minimized) setMinimized(false);
-    // Toggle the maximized state
-    setMaximized(!maximized);
+    setMaximized((prev) => !prev);
   };
 
   const handleMinimize = () => {
@@ -78,20 +84,19 @@ const ApplicationWindow: React.FC<ApplicationWindowProps> = ({
     setMinimized(false);
   };
 
-  // Decide the inline style for the window
+  // Decide window styles based on state:
   let windowStyle: React.CSSProperties = {};
 
   if (isMobile) {
-    // On mobile, we fill the screen
     windowStyle = {
       position: "fixed",
       top: 0,
       left: 0,
       width: "100%",
-      height: "100%",
+      height: `calc(100% - ${TASKBAR_HEIGHT}px)`,
     };
   } else if (maximized) {
-    // On desktop, if maximized, fill the desktop except for the taskbar
+    // Maximized: fill desktop except for taskbar
     windowStyle = {
       position: "absolute",
       top: 0,
@@ -100,7 +105,7 @@ const ApplicationWindow: React.FC<ApplicationWindowProps> = ({
       height: `calc(100% - ${TASKBAR_HEIGHT}px)`,
     };
   } else {
-    // Restored state (draggable)
+    // Restored state
     windowStyle = {
       position: "absolute",
       top: position.y,
@@ -110,49 +115,56 @@ const ApplicationWindow: React.FC<ApplicationWindowProps> = ({
     };
   }
 
+  const windowContent = (
+    <div
+      className={`app-window ${maximized ? "maximized" : ""}`}
+      ref={windowRef}
+      style={windowStyle}
+    >
+      <div className="app-window-header">
+        <div className="app-window-left">
+          <img src={iconSrc} alt="icon" className="app-window-icon" />
+          <span className="app-window-title">{title}</span>
+        </div>
+        <div className="app-window-right">
+          {minimized ? (
+            <button
+              className="app-window-btn restore-btn"
+              onClick={handleRestore}
+            />
+          ) : (
+            <>
+              <button
+                className="app-window-btn minimize-btn"
+                onClick={handleMinimize}
+              />
+              <button
+                className="app-window-btn maximize-btn"
+                onClick={handleMaximize}
+              />
+            </>
+          )}
+          <button className="app-window-btn close-btn" onClick={onClose} />
+        </div>
+      </div>
+      {!minimized && <div className="app-window-body">{children}</div>}
+    </div>
+  );
+
+  if (isMobile) {
+    return <div className="app-window-mobile">{windowContent}</div>;
+  }
+
   return (
     <Draggable
-      // Only allow dragging from the left side of the header
-      handle=".app-window-left"
-      // Exclude the right side + buttons from drag
-      cancel=".app-window-right, button"
-      // Only apply dragging if not maximized or mobile
-      disabled={isMobile || maximized}
+      handle=".app-window-left" /* Only the left part of header is draggable */
+      cancel=".app-window-right, button" /* Exclude buttons from dragging */
+      defaultPosition={{ x: 100, y: 100 }}
+      position={maximized ? undefined : position}
       onStart={handleDragStart}
       onStop={handleDragStop}
-      // We do not use position here; we rely on the inline style
-      // because we set position: absolute in windowStyle
-      // So Draggable modifies transform, but we "unmaximize" on dragStart
     >
-      <div className={`app-window`} ref={windowRef} style={windowStyle}>
-        <div className="app-window-header">
-          <div className="app-window-left">
-            <img src={iconSrc} alt="icon" className="app-window-icon" />
-            <span className="app-window-title">{title}</span>
-          </div>
-          <div className="app-window-right">
-            {minimized ? (
-              <button
-                className="app-window-btn restore-btn"
-                onClick={handleRestore}
-              />
-            ) : (
-              <>
-                <button
-                  className="app-window-btn minimize-btn"
-                  onClick={handleMinimize}
-                />
-                <button
-                  className="app-window-btn maximize-btn"
-                  onClick={handleMaximize}
-                />
-              </>
-            )}
-            <button className="app-window-btn close-btn" onClick={onClose} />
-          </div>
-        </div>
-        {!minimized && <div className="app-window-body">{children}</div>}
-      </div>
+      {windowContent}
     </Draggable>
   );
 };
