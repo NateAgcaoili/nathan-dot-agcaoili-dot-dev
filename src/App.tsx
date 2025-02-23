@@ -7,6 +7,8 @@ import "./App.css";
 import linkedinIcon from "./assets/icons/linkedin.svg";
 import githubIcon from "./assets/icons/github.svg";
 
+import aboutMeIcon from "/desktop-icons/about-me-icon.png";
+
 interface IconData {
   id: number;
   imageSrc: string;
@@ -14,7 +16,7 @@ interface IconData {
 }
 
 const icons: IconData[] = [
-  { id: 1, imageSrc: linkedinIcon, iconName: "About Me" },
+  { id: 1, imageSrc: aboutMeIcon, iconName: "About Me" },
   { id: 2, imageSrc: githubIcon, iconName: "Projects" },
   { id: 3, imageSrc: linkedinIcon, iconName: "Network Neighborhood" },
 ];
@@ -44,7 +46,7 @@ const App: React.FC = () => {
           iconSrc={openApp.imageSrc}
           onClose={() => setOpenApp(null)}
         >
-          <p>This is the content of the {openApp.iconName} window.</p>
+          <p>{openApp.iconName} coming soon!.</p>
         </ApplicationWindow>
       )}
     </div>
