@@ -9,7 +9,7 @@ interface ApplicationWindowProps {
   children: React.ReactNode;
 }
 
-const TASKBAR_HEIGHT = 32; // Height of your taskbar
+const TASKBAR_HEIGHT = 42; // Height of your taskbar
 
 const ApplicationWindow: React.FC<ApplicationWindowProps> = ({
   title,
