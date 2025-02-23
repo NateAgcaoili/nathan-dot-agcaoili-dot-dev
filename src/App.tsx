@@ -1,73 +1,52 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
+import Taskbar from "./components/Taskbar/Taskbar";
+import Desktop from "./components/Desktop/Desktop";
+import ApplicationWindow from "./components/ApplicationWindow/ApplicationWindow";
 import "./App.css";
-import Taskbar from "./Taskbar/Taskbar"; // <-- Import the Taskbar
 
-// Importing Social Media Icons
-import linkedinIcon from "./assets/icons/github.svg"; // Replace with actual LinkedIn icon
-import githubIcon from "./assets/icons/linkedin.svg"; // Replace with actual GitHub icon
+import linkedinIcon from "./assets/icons/linkedin.svg";
+import githubIcon from "./assets/icons/github.svg";
 
-const messages = [
-  "hi...",
-  "this page is currently under construction",
-  "but for now, here are my socials",
+interface IconData {
+  id: number;
+  imageSrc: string;
+  iconName: string;
+}
+
+const icons: IconData[] = [
+  { id: 1, imageSrc: linkedinIcon, iconName: "About Me" },
+  { id: 2, imageSrc: githubIcon, iconName: "Projects" },
+  { id: 3, imageSrc: linkedinIcon, iconName: "Network Neighborhood" },
 ];
 
 const App: React.FC = () => {
-  const [displayedText, setDisplayedText] = useState("");
-  const [currentMessageIndex, setCurrentMessageIndex] = useState(0);
-  const [charIndex, setCharIndex] = useState(0);
-  const [showIcons, setShowIcons] = useState(false);
-
-  useEffect(() => {
-    if (currentMessageIndex < messages.length) {
-      if (charIndex < messages[currentMessageIndex].length) {
-        const timeout = setTimeout(() => {
-          setDisplayedText(
-            (prev) => prev + messages[currentMessageIndex][charIndex]
-          );
-          setCharIndex(charIndex + 1);
-        }, 80); // **20% Faster Typing Speed**
-        return () => clearTimeout(timeout);
-      } else {
-        setTimeout(() => {
-          setCurrentMessageIndex(currentMessageIndex + 1);
-          setCharIndex(0);
-          setDisplayedText((prev) => prev + "\n"); // Add line break
-        }, 800); // **Shortened Delay Before Next Line**
-      }
-    } else {
-      setTimeout(() => setShowIcons(true), 400); // **Icons Appear Faster**
-    }
-  }, [charIndex, currentMessageIndex]);
+  const [openApp, setOpenApp] = useState<IconData | null>(null);
 
   return (
     <div className="container">
-      {/* Background Video */}
       <video className="background-video" autoPlay loop muted playsInline>
         <source src="/videos/vw_bg.mp4" type="video/mp4" />
         Your browser does not support the video tag.
       </video>
-      <pre className="typing-effect">{displayedText}</pre>{" "}
-      {/* Ensures line breaks */}
-      {/* Social Media Icons (Appear after Typing Effect with Fade-In) */}
-      <div className={`social-links ${showIcons ? "fade-in" : ""}`}>
-        <a
-          href="https://www.linkedin.com/in/YOUR-LINKEDIN"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <img src={linkedinIcon} alt="LinkedIn" className="social-icon" />
-        </a>
-        <a
-          href="https://github.com/YOUR-GITHUB"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <img src={githubIcon} alt="GitHub" className="social-icon" />
-        </a>
+      <div className="app-container">
+        <Desktop
+          icons={icons}
+          onIconClick={(icon) => {
+            console.log("Desktop icon clicked:", icon);
+            setOpenApp(icon);
+          }}
+        />
       </div>
-      {/* Render the Taskbar at the bottom */}
       <Taskbar />
+      {openApp && (
+        <ApplicationWindow
+          title={openApp.iconName}
+          iconSrc={openApp.imageSrc}
+          onClose={() => setOpenApp(null)}
+        >
+          <p>This is the content of the {openApp.iconName} window.</p>
+        </ApplicationWindow>
+      )}
     </div>
   );
 };

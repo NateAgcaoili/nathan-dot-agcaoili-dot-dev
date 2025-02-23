@@ -1,4 +1,10 @@
 @import url("https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap");
+@font-face {
+  font-family: "W95FA";
+  src: url("./fonts/W95FA.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+}
 
 /* Reset default margin and padding, set full height */
 html,
@@ -8,7 +14,7 @@ body {
   width: 100%;
   height: 100%;
   overflow: hidden; /* Prevent scrolling if video overflows */
-  font-family: "Press Start 2P", cursive;
+  font-family: "W95FA", sans-serif; /* Fallback if W95FA not loaded */
 }
 
 /* Fullscreen Background Video */
@@ -69,4 +75,11 @@ body {
 
 .social-icon:hover {
   transform: scale(1.1);
+}
+
+.app-container {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
 }
