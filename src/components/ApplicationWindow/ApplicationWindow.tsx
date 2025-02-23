@@ -7,34 +7,27 @@ interface ApplicationWindowProps {
   iconSrc: string;
   onClose: () => void;
   children: React.ReactNode;
-  // Flag to determine if this app should open full screen on desktop.
-  // For now, we'll default it to false.
   defaultMaximized?: boolean;
 }
 
-const TASKBAR_HEIGHT = 42; // Adjust this if your taskbar is a different height
+const TASKBAR_HEIGHT = 42;
 
 const ApplicationWindow: React.FC<ApplicationWindowProps> = ({
   title,
   iconSrc,
   onClose,
   children,
-  defaultMaximized = false, // default is not full screen on desktop
+  defaultMaximized = false,
 }) => {
   const [isMobile, setIsMobile] = useState(false);
   const [maximized, setMaximized] = useState(defaultMaximized);
   const [minimized, setMinimized] = useState(false);
 
-  // For restored state, store position and size:
-  const [position, setPosition] = useState<{ x: number; y: number }>({
-    x: 100,
-    y: 100,
-  });
+  // For restored state, store size; position is now managed by Draggable's transform.
   const [size, setSize] = useState<{ width: number; height: number }>({
-    width: 1000,
-    height: 800,
+    width: 400,
+    height: 300,
   });
-
   const windowRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -50,26 +43,24 @@ const ApplicationWindow: React.FC<ApplicationWindowProps> = ({
   useEffect(() => {
     if (maximized && windowRef.current) {
       windowRef.current.style.transform = "none";
-      windowRef.current.style.top = "0";
-      windowRef.current.style.left = "0";
     }
   }, [maximized]);
 
-  // When the user starts dragging the header, if maximized then restore
+  // If dragging starts on a maximized window, restore it.
   const handleDragStart: DraggableEventHandler = () => {
     if (maximized) {
       setMaximized(false);
-      // Restore to a default restored size/position.
-      setPosition({ x: 100, y: 100 });
+      // Optionally, update size/state here.
       setSize({ width: 400, height: 300 });
     }
   };
 
+  // On drag stop, we update nothing here since Draggable
+  // manages the position via transform; we don't use our own position state.
   const handleDragStop: DraggableEventHandler = (e, data) => {
-    e;
-    if (!maximized) {
-      setPosition({ x: data.x, y: data.y });
-    }
+    // You could store data.x, data.y here if you want to persist position,
+    // but then you’d have to control the component via the `position` prop,
+    // which we've seen causes snapping issues.
   };
 
   const handleMaximize = () => {
@@ -85,7 +76,6 @@ const ApplicationWindow: React.FC<ApplicationWindowProps> = ({
     setMinimized(false);
   };
 
-  // Decide window styles based on state:
   let windowStyle: React.CSSProperties = {};
 
   if (isMobile) {
@@ -97,7 +87,6 @@ const ApplicationWindow: React.FC<ApplicationWindowProps> = ({
       height: `calc(100% - ${TASKBAR_HEIGHT}px)`,
     };
   } else if (maximized) {
-    // Maximized: fill desktop except for taskbar
     windowStyle = {
       position: "absolute",
       top: 0,
@@ -106,11 +95,9 @@ const ApplicationWindow: React.FC<ApplicationWindowProps> = ({
       height: `calc(100% - ${TASKBAR_HEIGHT}px)`,
     };
   } else {
-    // Restored state
+    // Restored state: do not include top/left so Draggable controls it.
     windowStyle = {
       position: "absolute",
-      top: position.y,
-      left: position.x,
       width: size.width,
       height: size.height,
     };
@@ -158,10 +145,9 @@ const ApplicationWindow: React.FC<ApplicationWindowProps> = ({
 
   return (
     <Draggable
-      handle=".app-window-left" /* Only the left part of header is draggable */
-      cancel=".app-window-right, button" /* Exclude buttons from dragging */
+      handle=".app-window-header"
+      cancel=".app-window-right, button"
       defaultPosition={{ x: 100, y: 100 }}
-      position={maximized ? undefined : position}
       onStart={handleDragStart}
       onStop={handleDragStop}
     >
