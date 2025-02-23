@@ -33,7 +33,7 @@
 */
 .icon-name {
   display: block;
-  max-width: 120px; /* Matches icon width */
+  max-width: 90px; /* Matches icon width */
   margin: 4px auto 0; /* 4px top margin, auto center horizontally */
   font-size: 15px; /* Slightly larger for readability */
   line-height: 1.2;
