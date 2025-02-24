@@ -22,21 +22,23 @@ const ApplicationWindow: React.FC<ApplicationWindowProps> = ({
   defaultMaximized = false,
   resizable = true,
 }) => {
-  // Track whether we're on mobile
+  // Detect mobile
   const [isMobile, setIsMobile] = useState(false);
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth <= 768);
     handleResize();
     window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
   }, []);
 
   // Window states
   const [maximized, setMaximized] = useState(defaultMaximized);
   const [minimized, setMinimized] = useState(false);
 
-  // For the restored state, store: top, left, width, height
-  // This way, we can directly set inline styles with no transform.
+  // For the restored state, store top, left, width, height
+  // We'll apply them as inline styles with no transform usage.
   const [windowRect, setWindowRect] = useState<{
     top: number;
     left: number;
@@ -51,7 +53,7 @@ const ApplicationWindow: React.FC<ApplicationWindowProps> = ({
 
   const windowRef = useRef<HTMLDivElement>(null);
 
-  // If maximized on desktop, fill the screen minus taskbar
+  // If maximized on desktop, fill the screen minus the taskbar
   useEffect(() => {
     if (maximized && windowRef.current) {
       windowRef.current.style.top = "0px";
@@ -69,7 +71,9 @@ const ApplicationWindow: React.FC<ApplicationWindowProps> = ({
   const handleMinimize = () => setMinimized(true);
   const handleRestore = () => setMinimized(false);
 
-  // --- DRAGGING LOGIC (manual) ---
+  // ---------------------------
+  //     DRAGGING (MANUAL)
+  // ---------------------------
   const [dragging, setDragging] = useState(false);
   const dragStartRef = useRef<{
     startX: number;
@@ -81,11 +85,11 @@ const ApplicationWindow: React.FC<ApplicationWindowProps> = ({
   const onMouseDownHeader = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    // If maximized, restore to the old windowRect size
+    // If maximized, restore it
     if (maximized) {
       setMaximized(false);
-      // Optionally restore to some default or the last known windowRect
-      // But let's keep whatever we have in windowRect
+      // Keep the last known windowRect or default
+      // We won't reassign top/left here—just keep what we have
     }
     // Start dragging from the header
     setDragging(true);
@@ -97,6 +101,7 @@ const ApplicationWindow: React.FC<ApplicationWindowProps> = ({
     };
   };
 
+  // On mousemove, update the top/left.
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
       if (!dragging || !dragStartRef.current) return;
@@ -109,11 +114,9 @@ const ApplicationWindow: React.FC<ApplicationWindowProps> = ({
         left: startLeft + deltaX,
       }));
     };
-
     const handleMouseUp = () => {
       if (dragging) setDragging(false);
     };
-
     window.addEventListener("mousemove", handleMouseMove);
     window.addEventListener("mouseup", handleMouseUp);
     return () => {
@@ -122,7 +125,9 @@ const ApplicationWindow: React.FC<ApplicationWindowProps> = ({
     };
   }, [dragging]);
 
-  // --- RESIZING LOGIC (bottom-right corner) ---
+  // ---------------------------
+  //    RESIZING (MANUAL)
+  // ---------------------------
   const [resizing, setResizing] = useState(false);
   const resizeStartRef = useRef<{
     startX: number;
@@ -153,7 +158,6 @@ const ApplicationWindow: React.FC<ApplicationWindowProps> = ({
       const deltaY = e.clientY - startY;
       const newWidth = Math.max(MIN_WIDTH, startWidth + deltaX);
       const newHeight = Math.max(MIN_HEIGHT, startHeight + deltaY);
-      // Lock top-left, so we only expand from bottom-right
       setWindowRect((prev) => ({
         ...prev,
         width: newWidth,
@@ -171,7 +175,7 @@ const ApplicationWindow: React.FC<ApplicationWindowProps> = ({
     };
   }, [resizing]);
 
-  // Determine the inline style
+  // Decide the inline style
   let windowStyle: React.CSSProperties = {};
   if (isMobile) {
     // Mobile: fill screen minus taskbar
@@ -181,24 +185,30 @@ const ApplicationWindow: React.FC<ApplicationWindowProps> = ({
       left: 0,
       width: "100%",
       height: `calc(100% - ${TASKBAR_HEIGHT}px)`,
+      display: "flex",
+      flexDirection: "column",
     };
   } else if (maximized) {
-    // Maximize: fill screen minus taskbar
+    // Maximized: fill desktop minus the taskbar
     windowStyle = {
       position: "absolute",
       top: 0,
       left: 0,
       width: "100%",
       height: `calc(100% - ${TASKBAR_HEIGHT}px)`,
+      display: "flex",
+      flexDirection: "column",
     };
   } else {
-    // Restored mode: use top/left from state
+    // Restored
     windowStyle = {
       position: "absolute",
       top: windowRect.top,
       left: windowRect.left,
       width: windowRect.width,
       height: windowRect.height,
+      display: "flex",
+      flexDirection: "column",
     };
   }
 
@@ -223,7 +233,7 @@ const ApplicationWindow: React.FC<ApplicationWindowProps> = ({
             <>
               <button
                 className="app-window-btn minimize-btn"
-                onClick={() => setMinimized(true)}
+                onClick={handleMinimize}
               />
               <button
                 className="app-window-btn maximize-btn"
@@ -237,9 +247,12 @@ const ApplicationWindow: React.FC<ApplicationWindowProps> = ({
           <button className="app-window-btn close-btn" onClick={onClose} />
         </div>
       </div>
+
       {!minimized && (
-        <div className="app-window-body">
-          {children}
+        <>
+          {/* Middle content grows/shrinks in flex layout */}
+          <div className="app-window-body">{children}</div>
+
           {resizable && !maximized && (
             <div className="app-window-footer">
               <div
@@ -252,7 +265,7 @@ const ApplicationWindow: React.FC<ApplicationWindowProps> = ({
               </div>
             </div>
           )}
-        </div>
+        </>
       )}
     </div>
   );
