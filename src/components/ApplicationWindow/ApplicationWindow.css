@@ -159,3 +159,47 @@
   left: 50%;
   transform: translate(-50%, -50%);
 }
+/* Existing .app-window, .app-window-header, etc. remain unchanged */
+
+/* Footer container at the bottom of the window */
+.app-window-footer {
+  position: relative;
+  /* Windows 95 typically has a small bar or just the background color. */
+  height: 16px;
+  background-color: #c0c0c0;
+  border-top: 2px solid #fff; /* highlight line at top */
+}
+
+/* The bottom-right corner is our resizer handle */
+.app-window-resizer {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 16px;
+  height: 16px;
+  cursor: nwse-resize; /* typical diagonal resize cursor */
+}
+
+/* We'll place three small squares in a diagonal pattern */
+.resizer-line {
+  position: absolute;
+  width: 2px;
+  height: 2px;
+  background-color: #7d7d7d;
+}
+
+/* Slight offset for each "grip" line */
+.line1 {
+  bottom: 2px;
+  right: 2px;
+}
+
+.line2 {
+  bottom: 5px;
+  right: 5px;
+}
+
+.line3 {
+  bottom: 8px;
+  right: 8px;
+}
