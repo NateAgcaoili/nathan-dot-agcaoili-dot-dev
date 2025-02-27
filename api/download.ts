@@ -35,6 +35,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         }),
       }
     );
+    console.log(GA_MEASUREMENT_ID);
+    console.log(GA_API_SECRET);
     console.log("GA response status:", response.status);
     console.log("GA response text:", await response.text());
   } catch (err) {
