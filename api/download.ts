@@ -26,7 +26,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           events: [
             {
               name: "file_download",
-              params: { file_name: file },
+              params: {
+                file_name: file,
+                debug_mode: true,
+              },
             },
           ],
         }),
