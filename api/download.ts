@@ -16,7 +16,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   // Log the GA "file_download" event
   try {
-    await fetch(
+    const response = await fetch(
       `https://www.google-analytics.com/mp/collect?measurement_id=${GA_MEASUREMENT_ID}&api_secret=${GA_API_SECRET}`,
       {
         method: "POST",
@@ -35,6 +35,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         }),
       }
     );
+    console.log("GA response status:", response.status);
+    console.log("GA response text:", await response.text());
   } catch (err) {
     console.error("GA logging failed:", err);
     // We'll still proceed with redirect
