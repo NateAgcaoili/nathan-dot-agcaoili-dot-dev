@@ -22,7 +22,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          client_id: "download-logger",
+          client_id: `${Date.now()}-${Math.random().toString(36).substring(2)}`,
           events: [
             {
               name: "file_download",
